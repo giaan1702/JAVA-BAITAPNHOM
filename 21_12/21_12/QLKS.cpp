@@ -69,7 +69,7 @@ void drawPlot_revenue(vector<int>& vec, int day_in, int day_out) {
     }
 
     // Đường kẻ ngang ở trục x
-    cout << "     +";
+    cout << "     +";1
     for (int i = 0; i < width; ++i) {
         cout << "-----";
     }

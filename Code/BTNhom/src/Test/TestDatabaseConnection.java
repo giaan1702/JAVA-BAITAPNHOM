@@ -1,11 +1,12 @@
 package Test;
 import DaTa.DBConnection;
-import DaTa.UserDAO;
 import DaTa.User;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+
+import DAO.UserDAO;
 public class TestDatabaseConnection {
 	public static void main(String[] args) {
         // Test nối đến CSDL
