@@ -1,0 +1,81 @@
+package ui;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class Login extends JFrame implements ActionListener {
+
+    private JPanel panel;
+    private JLabel userLabel;
+    private JTextField userTextField;
+    private JLabel passwordLabel;
+    private JPasswordField passwordField;
+    private JButton loginButton;
+    private JButton registerButton;
+    private JLabel messageLabel;
+
+    private final String VALID_USERNAME = "admin";
+    private final String VALID_PASSWORD = "123";
+
+    public Login() {
+        setTitle("Màn hình Đăng nhập");
+        setSize(300, 200);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        panel = new JPanel();
+        panel.setLayout(new GridLayout(5, 2, 5, 5));
+
+        userLabel = new JLabel("Tên đăng nhập:");
+        userTextField = new JTextField();
+
+        passwordLabel = new JLabel("Mật khẩu:");
+        passwordField = new JPasswordField();
+
+        loginButton = new JButton("Đăng nhập");
+        loginButton.addActionListener(this);
+
+        registerButton = new JButton("Đăng ký");
+        registerButton.addActionListener(this);
+
+        messageLabel = new JLabel("", SwingConstants.CENTER);
+
+        panel.add(userLabel);
+        panel.add(userTextField);
+        panel.add(passwordLabel);
+        panel.add(passwordField);
+        panel.add(registerButton);
+        panel.add(loginButton);
+        panel.add(messageLabel);
+
+        add(panel, BorderLayout.CENTER);
+        setVisible(true);
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == loginButton) {
+            String username = userTextField.getText();
+            char[] passwordChars = passwordField.getPassword();
+            String password = String.valueOf(passwordChars);
+
+            if (username.equals(VALID_USERNAME) && password.equals(VALID_PASSWORD)) {
+                dispose();
+                new AdminDashboard().setVisible(true);
+            } else {
+                messageLabel.setText("Sai tên đăng nhập hoặc mật khẩu!");
+                messageLabel.setForeground(Color.RED);
+            }
+
+            java.util.Arrays.fill(passwordChars, '0');
+        } else if (e.getSource() == registerButton) {
+            dispose();
+            new Register().setVisible(true);
+        }
+    }
+
+    public static void main(String[] args) {
+        new Login();
+    }
+}

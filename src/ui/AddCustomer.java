@@ -1,0 +1,79 @@
+package ui;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class AddCustomer  extends JFrame {
+
+    private JTextField idField, usernameField, fullnameField;
+    private JButton saveButton, cancelButton;
+    private JPasswordField passwordField;
+    
+    
+    public AddCustomer() {
+        setTitle("Thêm người dùng");
+        setSize(300, 250);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        initUI();
+    }
+
+    private void initUI() {
+        JPanel panel = new JPanel(new GridLayout(5, 2, 10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+
+        // Thêm ID người dùng
+        panel.add(new JLabel("ID:"));
+        idField = new JTextField();
+        panel.add(idField);
+
+        // Thêm tên đăng nhập
+        panel.add(new JLabel("Tên đăng nhập:"));
+        usernameField = new JTextField();
+        panel.add(usernameField);
+
+
+        panel.add(new JLabel("Mật khẩu:"));
+        passwordField = new JPasswordField();
+        panel.add(passwordField);
+        
+        // Thêm họ tên
+        panel.add(new JLabel("Họ tên:"));
+        fullnameField = new JTextField();
+        panel.add(fullnameField);
+
+        // Thêm các nút lưu và hủy
+        saveButton = new JButton("Lưu");
+        cancelButton = new JButton("Hủy");
+
+        saveButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // Lấy dữ liệu từ các trường nhập
+                String id = idField.getText();
+                String username = usernameField.getText();
+                String fullname = fullnameField.getText();
+                char[] passwordChars = passwordField.getPassword();
+                String password = String.valueOf(passwordChars); 
+
+                // Kiểm tra nếu có thông tin thiếu
+                if (id.isEmpty() || username.isEmpty() || fullname.isEmpty() || password.isEmpty()) {
+                    JOptionPane.showMessageDialog(AddCustomer.this, "Vui lòng điền đầy đủ thông tin!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+                } else {
+                    // Xử lý lưu người dùng (Ví dụ: thêm vào cơ sở dữ liệu hoặc danh sách)
+                    JOptionPane.showMessageDialog(AddCustomer.this, "Đã thêm người dùng thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+                    dispose(); // Đóng cửa sổ sau khi thêm thành công
+                }
+            }
+        });
+
+        cancelButton.addActionListener(e -> dispose()); // Đóng cửa sổ nếu hủy
+
+        // Thêm các nút vào panel
+        panel.add(saveButton);
+        panel.add(cancelButton);
+
+        add(panel);
+    }
+}
