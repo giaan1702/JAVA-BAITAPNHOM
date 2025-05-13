@@ -1,0 +1,64 @@
+package DaTa;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+public class LoaiPhongDAO {
+	public boolean themLoaiPhong(LoaiPhong lp) throws ClassNotFoundException {
+        String sql = "INSERT INTO loaiphong (id, ten_loai, gia) VALUES (?, ?, ?)";
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, lp.getId());
+            ps.setString(2, lp.getTenLoai());
+            ps.setDouble(3, lp.getGia());
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean suaLoaiPhong(LoaiPhong lp) throws ClassNotFoundException {
+        String sql = "UPDATE loaiphong SET ten_loai=?, gia=? WHERE id=?";
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, lp.getTenLoai());
+            ps.setDouble(2, lp.getGia());
+            ps.setInt(3, lp.getId());
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean xoaLoaiPhong(int id) throws ClassNotFoundException {
+        String sql = "DELETE FROM loaiphong WHERE id=?";
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public List<LoaiPhong> layTatCaLoaiPhong() throws ClassNotFoundException {
+        List<LoaiPhong> list = new ArrayList<>();
+        String sql = "SELECT * FROM loaiphong";
+        try (Connection connection = DBConnection.getConnection();
+             Statement st = connection.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) {
+                list.add(new LoaiPhong(
+                        rs.getInt("id"),
+                        rs.getString("ten_loai"),
+                        rs.getDouble("gia")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+}

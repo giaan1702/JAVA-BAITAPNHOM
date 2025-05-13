@@ -1,0 +1,5 @@
+1 PhongDon 200000
+2 PhongDoi 300000
+3 PhongDeluxe 500000
+4 PhongGiaDinh 650000
+5 test 5555

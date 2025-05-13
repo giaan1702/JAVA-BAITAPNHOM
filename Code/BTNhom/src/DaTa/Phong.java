@@ -1,0 +1,22 @@
+package DaTa;
+
+public class Phong {
+	private int id;
+    private int soPhong;
+    private int loaiPhongId;
+
+    public Phong(int id, int soPhong, int loaiPhongId) {
+        this.id = id;
+        this.soPhong = soPhong;
+        this.loaiPhongId = loaiPhongId;
+    }
+
+    // Getters & Setters
+    public int getId() { return id; }
+    public int getSoPhong() { return soPhong; }
+    public int getLoaiPhongId() { return loaiPhongId; }
+
+    public void setId(int id) { this.id = id; }
+    public void setSoPhong(int soPhong) { this.soPhong = soPhong; }
+    public void setLoaiPhongId(int loaiPhongId) { this.loaiPhongId = loaiPhongId; }
+}
