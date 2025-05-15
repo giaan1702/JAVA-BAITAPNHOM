@@ -1,0 +1,138 @@
+package UI;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.*;
+import javax.swing.*;
+import javax.swing.JPanel;
+import javax.swing.table.DefaultTableModel;
+
+import DATA.KhachHang;
+import Service.KhachHangService;
+import java.util.*;
+import java.util.List;
+
+public class ViewCustomer extends JFrame implements ActionListener {
+	private JTable table;
+    private DefaultTableModel model;
+    private JButton btnAdd, btnEdit, btnDelete, btnSave, btnBack;
+    private KhachHangService khService = new KhachHangService();
+	public ViewCustomer() {
+		this.setTitle("Quản lý Khách hàng");
+        setSize(1000, 600);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		initUI();
+        loadData();
+        setVisible(true);
+	}
+	private void initUI() {
+
+        // Panel chứa bảng
+        JPanel tablePanel = new JPanel(new BorderLayout());
+        String[] columns = {"ID", "Họ tên", "Quốc tịch", "Loại giấy tờ", "Số giấy tờ", "SĐT", "Email"};
+        model = new DefaultTableModel(columns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        table = new JTable(model);
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tablePanel.add(new JScrollPane(table), BorderLayout.CENTER);
+
+        // Panel chứa nút
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        btnAdd = new JButton("Thêm");
+        btnEdit = new JButton("Sửa");
+        btnDelete = new JButton("Xóa");
+        btnSave = new JButton("Lưu");
+        btnBack = new JButton("Quay lại");
+
+        for (JButton btn : new JButton[]{btnAdd, btnEdit, btnDelete, btnSave, btnBack}) {
+            btn.addActionListener(this);
+            buttonPanel.add(btn);
+        }
+
+        add(tablePanel, BorderLayout.CENTER);
+        add(buttonPanel, BorderLayout.SOUTH);
+    }
+	public void loadData() {
+        model.setRowCount(0);
+        try {
+            List<KhachHang> ds = khService.layTatCaKhachHang();
+            for (KhachHang kh : ds) {
+                model.addRow(new Object[]{
+                    kh.getId(),
+                    kh.getHoTen(),
+                    kh.getQuocTich(),
+                    kh.getLoaiGiayTo(),
+                    kh.getSoGiayTo(),
+                    kh.getSdt(),
+                    kh.getEmail()
+                });
+            }
+        } catch (ClassNotFoundException e) {
+            JOptionPane.showMessageDialog(this, "Lỗi tải dữ liệu: " + e.getMessage());
+        }
+    }
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() == btnAdd) {
+			dispose();
+            new AddCustomer().setVisible(true);
+        } else if (e.getSource() == btnEdit) {
+           editCustomer();
+        } else if (e.getSource() == btnDelete) {
+            deleteCustomer();
+        } else if (e.getSource() == btnBack) {
+            dispose();
+            
+        }
+        loadData();
+	}
+	 private void editCustomer() {
+	        int selectedRow = table.getSelectedRow();
+	        if (selectedRow == -1) {
+	            JOptionPane.showMessageDialog(this, "Vui lòng chọn khách hàng cần sửa");
+	            return;
+	        }
+	        
+	        int id = (int) model.getValueAt(selectedRow, 0);
+	        KhachHang kh = khService.timKhachHangTheoId(id);
+	        
+	        if (kh != null) {
+	            new EditCustomer(this, kh).setVisible(true); // Truyền this vào EditCustomer
+	        } else {
+	            JOptionPane.showMessageDialog(this, "Không tìm thấy khách hàng");
+	        }
+	    }
+	
+	 private void deleteCustomer() {
+	        int row = table.getSelectedRow();
+	        if (row == -1) {
+	            JOptionPane.showMessageDialog(this, "Vui lòng chọn khách hàng cần xóa");
+	            return;
+	        }
+	        int id = (int) model.getValueAt(row, 0);
+	        int confirm = JOptionPane.showConfirmDialog(this, 
+	            "Xác nhận xóa khách hàng ID: " + id + "?", "Xóa khách hàng", 
+	            JOptionPane.YES_NO_OPTION);
+	        
+	        if (confirm == JOptionPane.YES_OPTION) {
+	            try {
+	                if (khService.xoaKhachHang(id)) {
+	                    JOptionPane.showMessageDialog(this, "Xóa thành công!");
+	                    loadData();
+	                }
+	            } catch (ClassNotFoundException ex) {
+	                JOptionPane.showMessageDialog(this, "Lỗi: " + ex.getMessage());
+	            }
+	        }
+	    }
+
+	public static void main(String args[]) {
+		new ViewCustomer();
+	}
+
+}

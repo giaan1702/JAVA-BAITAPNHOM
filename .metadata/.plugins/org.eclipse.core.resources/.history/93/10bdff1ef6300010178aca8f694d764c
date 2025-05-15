@@ -1,0 +1,121 @@
+package UI;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JFrame;
+
+import DATA.KhachHang;
+import Service.KhachHangService;
+
+import java.awt.*;
+import javax.swing.*;
+public class EditCustomer extends JFrame implements ActionListener {
+	private JTextField tfId, tfHoTen, tfQuocTich, tfLoaiGT, tfSoGT, tfSDT, tfEmail;
+    private JButton btnSave, btnBack;
+    private KhachHang kh;
+    private ViewCustomer parentView;
+    private KhachHangService khService = new KhachHangService();
+    
+	public EditCustomer(ViewCustomer parent, KhachHang khachHang) {
+		this.parentView = parent;
+	    this.kh = khachHang;
+		initUI();
+        setTitle("Sửa Thông Tin Khách Hàng");
+        setSize(400, 350);
+        setLocationRelativeTo(parent);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setVisible(true);
+	}
+	
+	 
+	    
+	    
+	    private void initUI() {
+
+	    	JPanel panel = new JPanel(new BorderLayout());
+	        JPanel formPanel = new JPanel(new GridLayout(7, 2, 5, 5));
+
+	        // ID field
+	        formPanel.add(new JLabel("ID:"));
+	        tfId = new JTextField();
+	        tfId.setEditable(false);
+	        formPanel.add(tfId);
+
+	        // Other fields
+	        String[] labels = {"Họ tên:", "Quốc tịch:", "Loại giấy tờ:", "Số giấy tờ:", "SĐT:", "Email:"};
+	        JTextField[] fields = {tfHoTen = new JTextField(), 
+	                             tfQuocTich = new JTextField(),
+	                             tfLoaiGT = new JTextField(),
+	                             tfSoGT = new JTextField(),
+	                             tfSDT = new JTextField(),
+	                             tfEmail = new JTextField()};
+
+	        for (int i = 0; i < labels.length; i++) {
+	            formPanel.add(new JLabel(labels[i]));
+	            formPanel.add(fields[i]);
+	        }
+
+	        // Button panel
+	        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+	        btnSave = new JButton("Lưu");
+	        btnBack = new JButton("Quay lại");
+	        btnSave.addActionListener(this);
+	        btnBack.addActionListener(this);
+	        buttonPanel.add(btnBack);
+	        buttonPanel.add(btnSave);
+
+	        panel.add(formPanel, BorderLayout.CENTER);
+	        panel.add(buttonPanel, BorderLayout.SOUTH);
+	        add(panel);
+
+	        if (kh != null) {
+	            fillData();
+	        }
+	    }
+	    
+	    private void fillData() {
+	    	 tfId.setText(String.valueOf(kh.getId()));
+	         tfHoTen.setText(kh.getHoTen());
+	         tfQuocTich.setText(kh.getQuocTich());
+	         tfLoaiGT.setText(kh.getLoaiGiayTo());
+	         tfSoGT.setText(kh.getSoGiayTo());
+	         tfSDT.setText(kh.getSdt());
+	         tfEmail.setText(kh.getEmail());
+	    }
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		 if (e.getSource() == btnBack) {
+	            dispose();
+	            
+	        } else if (e.getSource() == btnSave) {
+	            saveChanges();
+	            
+	        }
+	    }
+
+	    private void saveChanges() {
+	        try {
+	            KhachHang updatedKH = new KhachHang(
+	                kh.getId(),
+	                tfHoTen.getText(),
+	                tfQuocTich.getText(),
+	                tfLoaiGT.getText(),
+	                tfSoGT.getText(),
+	                tfSDT.getText(),
+	                tfEmail.getText()
+	            );
+
+	            if (khService.suaKhachHang(updatedKH)) {
+	                JOptionPane.showMessageDialog(this, "Cập nhật thành công!");
+	                parentView.loadData(); // Refresh parent table
+	                dispose();
+	            }
+	        } catch (Exception ex) {
+	            JOptionPane.showMessageDialog(this, "Lỗi: " + ex.getMessage());
+	        }
+	    }
+		
+	}
+
+

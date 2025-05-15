@@ -1,0 +1,37 @@
+package Service;
+
+import java.util.List;
+
+import DAO.LoaiPhongDAO;
+import DATA.LoaiPhong;
+
+public class LoaiPhongService {
+	private LoaiPhongDAO lpDao = new LoaiPhongDAO();
+
+    public boolean themLoaiPhong(LoaiPhong lp) throws ClassNotFoundException {
+        if (lp == null
+            || lp.getTenLoai().isBlank()
+            || lp.getGia() <= 0) {
+            return false;
+        }
+        return lpDao.themLoaiPhong(lp);
+    }
+
+    public boolean suaLoaiPhong(LoaiPhong lp) throws ClassNotFoundException {
+        if (lp == null || lp.getId() <= 0) return false;
+        return lpDao.suaLoaiPhong(lp);
+    }
+
+    public boolean xoaLoaiPhong(int id) throws ClassNotFoundException {
+        if (id <= 0) return false;
+        return lpDao.xoaLoaiPhong(id);
+    }
+
+    public List<LoaiPhong> layTatCaLoaiPhong() throws ClassNotFoundException {
+        return lpDao.layTatCaLoaiPhong();
+    }
+
+    public LoaiPhong timTheoId(int id) {
+        return lpDao.findById(id);
+    }
+}

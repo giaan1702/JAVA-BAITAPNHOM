@@ -1,0 +1,28 @@
+package UI;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.*;
+import javax.swing.*;
+import javax.swing.JPanel;
+import javax.swing.table.DefaultTableModel;
+
+import Service.KhachHangService;
+
+public class ViewCustomer extends JPanel implements ActionListener {
+	
+	private JTable table;
+    private DefaultTableModel tableModel;
+    private JButton btnThem, btnSua, btnXoa, btnRefresh, btnQuayLai;
+    private KhachHangService khService = new KhachHangService();
+	public ViewCustomer() {
+		initUI();
+        loadData();
+	}
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+}

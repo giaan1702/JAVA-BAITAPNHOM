@@ -1,0 +1,193 @@
+package UI;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Date;
+import java.time.temporal.ChronoUnit;
+
+import javax.swing.JFrame;
+import javax.swing.table.DefaultTableModel;
+
+import DAO.DatPhongDAO;
+import DAO.KhachHangDAO;
+import DAO.LoaiPhongDAO;
+import DAO.PhongDAO;
+import DATA.DatPhong;
+import DATA.LoaiPhong;
+import DATA.Phong;
+
+import java.awt.*;
+import javax.swing.*;
+import java.util.List;
+public class Payment extends JFrame implements ActionListener {
+	private JTextField txtCustomerName;
+    private JButton btnSearch, btnPay, btnCancel;
+    private JTable tblPayment;
+    private DefaultTableModel tableModel;
+    private JLabel lblTotal;
+    
+	public Payment() {
+		initUI();
+        setTitle("Hệ thống Thanh toán");
+        setSize(800, 500);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+	}
+	
+	 private void initUI() {
+	        JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
+	        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+	        
+	        // Panel tìm kiếm
+	        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+	        searchPanel.add(new JLabel("Tên khách hàng:"));
+	        txtCustomerName = new JTextField(20);
+	        searchPanel.add(txtCustomerName);
+	        
+	        btnSearch = new JButton("Tìm kiếm");
+	        btnSearch.addActionListener(this);
+	        searchPanel.add(btnSearch);
+	        
+	        mainPanel.add(searchPanel, BorderLayout.NORTH);
+	        
+	        // Bảng thanh toán
+	        String[] columns = {"Số phòng", "Loại phòng", "Ngày đến", "Ngày đi", "Số ngày", "Đơn giá", "Thành tiền"};
+	        tableModel = new DefaultTableModel(columns, 0) {
+	            @Override
+	            public boolean isCellEditable(int row, int column) {
+	                return false;
+	            }
+	        };
+	        
+	        tblPayment = new JTable(tableModel);
+	        tblPayment.setPreferredScrollableViewportSize(new Dimension(750, 300));
+	        JScrollPane scrollPane = new JScrollPane(tblPayment);
+	        mainPanel.add(scrollPane, BorderLayout.CENTER);
+	        
+	        // Panel tổng và nút bấm
+	        JPanel bottomPanel = new JPanel(new BorderLayout());
+	        
+	        lblTotal = new JLabel("Tổng cộng: 0 VND", JLabel.RIGHT);
+	        lblTotal.setFont(new Font("Arial", Font.BOLD, 14));
+	        bottomPanel.add(lblTotal, BorderLayout.NORTH);
+	        
+	        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+	        btnPay = new JButton("Thanh toán");
+	        btnPay.addActionListener(this);
+	        btnCancel = new JButton("Hủy");
+	        btnCancel.addActionListener(this);
+	        
+	        buttonPanel.add(btnPay);
+	        buttonPanel.add(btnCancel);
+	        bottomPanel.add(buttonPanel, BorderLayout.SOUTH);
+	        
+	        mainPanel.add(bottomPanel, BorderLayout.SOUTH);
+	        
+	        add(mainPanel);
+	    }
+	    
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		 if (e.getSource() == btnSearch) {
+	            searchCustomer();
+	        } else if (e.getSource() == btnPay) {
+	            processPayment();
+	        } else if (e.getSource() == btnCancel) {
+	            dispose();
+	        }
+	}
+	
+	private void searchCustomer() {
+	    String customerName = txtCustomerName.getText().trim();
+	    if (customerName.isEmpty()) {
+	        JOptionPane.showMessageDialog(this, "Vui lòng nhập tên khách hàng", "Lỗi", JOptionPane.ERROR_MESSAGE);
+	        return;
+	    }
+	    
+	    try {
+	        // Lấy ID khách hàng từ tên
+	        int customerId = KhachHangDAO.findIdByName(customerName);
+	        if (customerId == -1) {
+	            JOptionPane.showMessageDialog(this, "Không tìm thấy khách hàng", "Lỗi", JOptionPane.ERROR_MESSAGE);
+	            return;
+	        }
+	        
+	        // Lấy danh sách đặt phòng của khách hàng
+	        DatPhongDAO datPhongDAO = new DatPhongDAO();
+	        List<DatPhong> bookings = datPhongDAO.findByKhachHangId(customerId);
+	        
+	        if (bookings.isEmpty()) {
+	            JOptionPane.showMessageDialog(this, "Khách hàng chưa đặt phòng nào", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+	            return;
+	        }
+	        
+	        // Xóa dữ liệu cũ trong bảng
+	        tableModel.setRowCount(0);
+	        
+	        // Tính toán và hiển thị thông tin thanh toán
+	        double total = 0;
+	        PhongDAO phongDAO = new PhongDAO();
+	        LoaiPhongDAO loaiPhongDAO = new LoaiPhongDAO();
+	        
+	        for (DatPhong booking : bookings) {
+	            // Lấy thông tin phòng
+	            Phong phong = phongDAO.findBySoPhong(booking.getPhongId());
+	            if (phong == null) {
+	                System.err.println("Không tìm thấy phòng với số phòng: " + booking.getPhongId());
+	                continue;
+	            }
+	            
+	            // Lấy thông tin loại phòng
+	            LoaiPhong loaiPhong = loaiPhongDAO.findById(phong.getLoaiPhongId());
+	            if (loaiPhong == null) {
+	                System.err.println("Không tìm thấy loại phòng với ID: " + phong.getLoaiPhongId());
+	                continue;
+	            }
+	            
+	            // Tính số ngày ở
+	            Date ngayDen = booking.getNgayDen();
+	            Date ngayDi = booking.getNgayDi();
+	            long soNgay = ChronoUnit.DAYS.between(ngayDen.toLocalDate(), ngayDi.toLocalDate())+1;
+	            
+	            // Tính thành tiền
+	            double thanhTien = soNgay * loaiPhong.getGia();
+	            total += thanhTien;
+	            
+	            // Thêm vào bảng
+	            tableModel.addRow(new Object[]{
+	                booking.getPhongId(),
+	                loaiPhong.getTenLoai(),
+	                ngayDen.toString(),
+	                ngayDi.toString(),
+	                soNgay,
+	                String.format("%,d VND", (int)loaiPhong.getGia()),
+	                String.format("%,d VND", (int)thanhTien)
+	            });
+	        }
+	        
+	        // Hiển thị tổng tiền
+	        lblTotal.setText(String.format("Tổng cộng: %,d VND", (int)total));
+	        
+	    } catch (Exception ex) {
+	        JOptionPane.showMessageDialog(this, "Lỗi khi tìm kiếm: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+	        ex.printStackTrace();
+	    }
+	}
+    
+    private void processPayment() {
+        if (tableModel.getRowCount() == 0) {
+            JOptionPane.showMessageDialog(this, "Không có hóa đơn để thanh toán", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        // Xử lý thanh toán (có thể thêm vào CSDL hoặc gửi email xác nhận)
+        JOptionPane.showMessageDialog(this, "Thanh toán thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+        dispose();
+    }
+    
+    public static void main(String[] args) {
+        new Payment().setVisible(true);
+    }
+	
+
+}

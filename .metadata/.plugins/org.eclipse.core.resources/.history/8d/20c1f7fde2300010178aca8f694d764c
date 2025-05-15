@@ -1,0 +1,121 @@
+package UI;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.*;
+import javax.swing.*;
+import javax.swing.JFrame;
+
+public class StaffDashboard extends JFrame implements ActionListener {
+	private int StaffID;
+    private JPanel navPanel;
+    private JButton bookRoomButton;
+    private JButton viewInvoiceButton;
+    private JButton bookingHistoryButton;
+    private JButton paymentButton;
+    private JButton logoutButton;
+    private JPanel footerPanel;
+    private JPanel mainPanel;
+    private CardLayout cardLayout;
+
+    // Panels
+    private JPanel bookRoomPanel;
+    private JPanel viewInvoicePanel;
+    private JPanel bookingHistoryPanel;
+    private JPanel paymentPanel;
+	
+	public StaffDashboard() {
+		setTitle("Hệ thống Quản lý Khách sạn - Trang Nhân Viên");
+        setSize(800, 600);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        setLayout(new BorderLayout());
+
+        cardLayout = new CardLayout();
+        mainPanel = new JPanel(cardLayout);
+
+        // Khởi tạo các panel (có thể thay bằng panel thực)
+        bookRoomPanel = new JPanel();
+        viewInvoicePanel = new JPanel();
+        bookingHistoryPanel = new JPanel();
+        paymentPanel = new JPanel();
+
+        // Đăng ký các panel vào mainPanel
+        mainPanel.add(bookRoomPanel, "bookRoom");
+        mainPanel.add(viewInvoicePanel, "viewInvoice");
+        mainPanel.add(bookingHistoryPanel, "bookingHistory");
+        mainPanel.add(paymentPanel, "payment");
+
+        // Tạo các nút
+        bookRoomButton = new JButton("🛏 Đặt phòng");
+        viewInvoiceButton = new JButton("📄 Xem hóa đơn");
+        bookingHistoryButton = new JButton("📅 Lịch sử đặt phòng");
+        paymentButton = new JButton("💳 Thanh toán");
+        logoutButton = new JButton("Đăng xuất");
+
+        // Căn chỉnh nút
+        Dimension buttonSize = new Dimension(200, 40);
+        JButton[] buttons = {bookRoomButton, viewInvoiceButton, bookingHistoryButton, paymentButton};
+        for (JButton btn : buttons) {
+            btn.setMaximumSize(buttonSize);
+            btn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        }
+
+        // Panel menu bên trái
+        navPanel = new JPanel();
+        navPanel.setLayout(new BoxLayout(navPanel, BoxLayout.Y_AXIS));
+        navPanel.add(Box.createVerticalGlue());
+        navPanel.add(bookRoomButton);
+        navPanel.add(Box.createRigidArea(new Dimension(5, 10)));
+        navPanel.add(viewInvoiceButton);
+        navPanel.add(Box.createRigidArea(new Dimension(5, 10)));
+        navPanel.add(bookingHistoryButton);
+        navPanel.add(Box.createRigidArea(new Dimension(5, 10)));
+        navPanel.add(paymentButton);
+        navPanel.add(Box.createVerticalGlue());
+
+        add(navPanel, BorderLayout.WEST);
+
+        // Footer với nút Đăng xuất
+        footerPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        footerPanel.add(logoutButton);
+        add(footerPanel, BorderLayout.SOUTH);
+
+        // Gắn ActionListener
+        bookRoomButton.addActionListener(this);
+        viewInvoiceButton.addActionListener(this);
+        bookingHistoryButton.addActionListener(this);
+        paymentButton.addActionListener(this);
+        logoutButton.addActionListener(this);
+
+        add(mainPanel, BorderLayout.CENTER);
+
+        JLabel welcomeLabel = new JLabel("Chào mừng, Nhân Viên!", SwingConstants.CENTER);
+        mainPanel.add(welcomeLabel, "home");
+        cardLayout.show(mainPanel, "home");
+
+        setVisible(true);
+    }
+	
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() == bookRoomButton) {
+           // new BookingDateChooser2(CustomerID);
+        } else if (e.getSource() == viewInvoiceButton) {
+            cardLayout.show(mainPanel, "viewInvoice");
+        } else if (e.getSource() == bookingHistoryButton) {
+            bookingHistoryPanel.removeAll();
+            bookingHistoryPanel.setLayout(new BorderLayout());
+         //   bookingHistoryPanel.add(new BookingHistoryCustomer(CustomerID), BorderLayout.CENTER);
+            bookingHistoryPanel.revalidate();
+            bookingHistoryPanel.repaint();
+            cardLayout.show(mainPanel, "bookingHistory");
+        } else if (e.getSource() == logoutButton) {
+            dispose();
+            new Login().setVisible(true);
+        }
+	}
+	public static void main(String[] args) {
+        new StaffDashboard();
+    }
+
+}

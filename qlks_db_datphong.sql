@@ -1,0 +1,58 @@
+-- MySQL dump 10.13  Distrib 8.0.42, for Win64 (x86_64)
+--
+-- Host: 127.0.0.1    Database: qlks_db
+-- ------------------------------------------------------
+-- Server version	8.4.5
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `datphong`
+--
+
+DROP TABLE IF EXISTS `datphong`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `datphong` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `so_phong` int DEFAULT NULL,
+  `id_khachhang` int DEFAULT NULL,
+  `ngay_den` date DEFAULT NULL,
+  `ngay_di` date DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `so_phong` (`so_phong`),
+  KEY `datphong_ibfk_2` (`id_khachhang`),
+  CONSTRAINT `datphong_ibfk_1` FOREIGN KEY (`so_phong`) REFERENCES `phong` (`so_phong`),
+  CONSTRAINT `datphong_ibfk_2` FOREIGN KEY (`id_khachhang`) REFERENCES `khachhang` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `datphong`
+--
+
+LOCK TABLES `datphong` WRITE;
+/*!40000 ALTER TABLE `datphong` DISABLE KEYS */;
+INSERT INTO `datphong` VALUES (1,101,2,'2024-05-01','2024-05-04'),(2,201,3,'2024-05-05','2024-05-10'),(3,101,4,'2024-05-05','2024-05-06'),(4,102,4,'2024-05-05','2024-05-06'),(6,101,4,'2024-05-09','2024-05-31'),(7,102,5,'2024-05-01','2024-05-05'),(8,201,4,'2024-05-01','2024-05-02'),(9,101,8,'2024-05-01','2024-05-01'),(10,202,9,'2024-05-05','2024-05-05'),(11,103,19,'2024-05-02','2024-05-07'),(12,304,17,'2024-05-02','2024-05-10'),(14,104,18,'2024-05-20','2024-05-25'),(15,203,13,'2024-05-02','2024-05-06'),(16,501,3,'2024-05-02','2024-05-06'),(17,101,1,'2025-05-15','2025-05-15'),(18,101,1,'2025-05-02','2025-05-04'),(19,101,1,'2025-05-15','2025-05-15'),(20,201,1,'2025-05-15','2025-05-15'),(21,404,1,'2025-05-15','2025-05-15');
+/*!40000 ALTER TABLE `datphong` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2025-05-15 11:43:57

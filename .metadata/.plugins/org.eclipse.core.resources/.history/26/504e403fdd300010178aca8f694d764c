@@ -1,0 +1,94 @@
+package UI;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.*;
+import javax.swing.*;
+import javax.swing.JFrame;
+
+import DATA.User;
+import Service.UserService;
+
+public class Login extends JFrame implements ActionListener {
+	private JPanel panel;
+    private JLabel userLabel, passwordLabel, messageLabel;
+    private JTextField userTextField;
+    private JPasswordField passwordField;
+    private JButton loginButton;
+    private UserService userService;
+    
+    public Login() {
+    	userService = new UserService();
+        initializeUI();
+    }
+    private void initializeUI() {
+        setTitle("Màn hình Đăng nhập");
+        setSize(300, 200);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        panel = new JPanel(new GridLayout(4, 2, 5, 5)); // Điều chỉnh từ 5 -> 4 hàng
+
+        // Các component
+        userLabel = new JLabel("Tên đăng nhập:");
+        userTextField = new JTextField();
+        passwordLabel = new JLabel("Mật khẩu:");
+        passwordField = new JPasswordField();
+        loginButton = new JButton("Đăng nhập");
+        messageLabel = new JLabel("", SwingConstants.CENTER);
+
+        // Thêm sự kiện
+        loginButton.addActionListener(this);
+
+        // Thêm components vào panel
+        panel.add(userLabel);
+        panel.add(userTextField);
+        panel.add(passwordLabel);
+        panel.add(passwordField);
+        panel.add(new JLabel()); // Placeholder
+        panel.add(loginButton);
+        panel.add(messageLabel);
+
+        add(panel, BorderLayout.CENTER);
+        setVisible(true);
+    
+    
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		 if (e.getSource() == loginButton) {
+	            handleLogin();
+	        }
+	}
+	private void handleLogin() {
+        String username = userTextField.getText().trim();
+        String password = new String(passwordField.getPassword()).trim();
+
+        if (username.isEmpty() || password.isEmpty()) {
+            showError("Vui lòng nhập đầy đủ thông tin!");
+            return;
+        }
+
+        User user = userService.login(username, password);
+        if (user == null) {
+            showError("Sai tên đăng nhập hoặc mật khẩu!");
+            return;
+        }
+
+        // Phân quyền theo role
+        if (user.getRole() == 1) {
+            new AdminDashboard().setVisible(true);
+        } else {
+            new StaffDashboard().setVisible(true);
+        }
+        dispose();
+    }
+
+    private void showError(String message) {
+        messageLabel.setText(message);
+        messageLabel.setForeground(Color.RED);
+    }
+	public static void main(String[] args) {
+        new Login();
+    }
+
+}

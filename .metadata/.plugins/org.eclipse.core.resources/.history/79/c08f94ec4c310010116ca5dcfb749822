@@ -1,0 +1,113 @@
+package UI;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+
+import javax.swing.JFrame;
+
+import com.toedter.calendar.JDateChooser;
+
+import DAO.KhachHangDAO;
+
+import java.awt.*;
+import javax.swing.*;
+public class Booking1 extends JFrame implements ActionListener {
+	
+	private JTextField txtCustomerName;
+    private JButton btnContinue,btnBack;
+    private JSpinner spinnerCheckin, spinnerCheckout;
+    private KhachHangDAO khachHangDAO = new KhachHangDAO();
+
+	    
+	public Booking1() {
+		 initUI();
+	        setTitle("Đặt Phòng Khách Sạn");
+	        setSize(400, 250);
+	        setLocationRelativeTo(null);
+	        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+	        setVisible(true);
+	}
+	public void initUI() {
+		JPanel panel = new JPanel(new GridLayout(5, 2, 10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        // Customer ID
+        panel.add(new JLabel("Tên Khách hàng:"));
+        txtCustomerName = new JTextField();
+        panel.add(txtCustomerName);
+
+        // Check-in Date
+        panel.add(new JLabel("Ngày Check-in:"));
+        spinnerCheckin = new JSpinner(new SpinnerDateModel());
+        spinnerCheckin.setEditor(new JSpinner.DateEditor(spinnerCheckin, "dd/MM/yyyy"));
+        panel.add(spinnerCheckin);
+
+        // Check-out Date
+        panel.add(new JLabel("Ngày Check-out:"));
+        spinnerCheckout = new JSpinner(new SpinnerDateModel());
+        spinnerCheckout.setEditor(new JSpinner.DateEditor(spinnerCheckout, "dd/MM/yyyy"));
+        panel.add(spinnerCheckout);
+
+        // Continue Button
+        btnContinue = new JButton("Tiếp tục");
+        btnContinue.addActionListener(this);
+        panel.add(btnContinue);
+        btnBack = new JButton("Quay lại");
+        btnBack.addActionListener(this);
+        panel.add(btnBack);
+
+        add(panel);
+
+	}
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() == btnContinue) {
+            handleContinue();
+        } else if (e.getSource() == btnBack) {
+            dispose();
+        }
+	} 
+	private void handleContinue() {
+        try {
+            // Validate customer name
+            String customerName = txtCustomerName.getText().trim();
+            if (customerName.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Vui lòng nhập tên khách hàng!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            if (!khachHangDAO.isCustomerExistByName(customerName)) {
+                JOptionPane.showMessageDialog(this, "Không tìm thấy khách hàng!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Get dates
+            LocalDate checkin = LocalDate.ofInstant(
+                ((java.util.Date) spinnerCheckin.getValue()).toInstant(), 
+                java.time.ZoneId.systemDefault()
+            );
+            
+            LocalDate checkout = LocalDate.ofInstant(
+                ((java.util.Date) spinnerCheckout.getValue()).toInstant(), 
+                java.time.ZoneId.systemDefault()
+            );
+
+            // Validate dates
+            if (checkin.isAfter(checkout)) {
+                JOptionPane.showMessageDialog(this, "Ngày check-in không được sau check-out!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+        
+
+            JOptionPane.showMessageDialog(this, "Thông tin hợp lệ! Tiến hành chọn phòng...");
+           new Booking2(customerName, checkin, checkout).setVisible(true);
+       
+
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Lỗi hệ thống: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+}

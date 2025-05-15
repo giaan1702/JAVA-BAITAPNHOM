@@ -1,0 +1,106 @@
+package UI;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.*;
+import javax.swing.*;
+import javax.swing.JFrame;
+
+public class AdminDashboard extends JFrame implements ActionListener {
+	private JLabel welcomeLabel;
+    private JPanel navPanel;
+    private JButton roomButton;
+    private JButton guestButton;
+    private JButton bookingButton;
+    private JPanel footerPanel;
+    private JButton logoutButton;
+    private JPanel mainpanel;
+    private CardLayout cardLayout;
+    
+    public AdminDashboard() {
+    	cardLayout = new CardLayout();
+        setTitle("Hệ thống Quản lý Khách sạn - Trang Admin");
+        setSize(800, 600);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        setLayout(new BorderLayout());
+        mainpanel = new JPanel();
+        
+        welcomeLabel = new JLabel("Chào mừng, Admin!", SwingConstants.CENTER);
+        mainpanel.setLayout(cardLayout);
+        mainpanel.add(welcomeLabel);
+        add(mainpanel, BorderLayout.CENTER);
+        navPanel = new JPanel();
+        navPanel.setLayout(new BoxLayout(navPanel, BoxLayout.Y_AXIS));
+        JPanel room = new RoomManagementPanel();
+        JPanel customer = new CustomerManagementPanel();
+        JPanel booking = new BookingManagementPanel();
+        mainpanel.add(customer, "guest");
+        mainpanel.add(room, "room");
+        mainpanel.add(booking,"booking");
+        
+        // Tạo các nút điều hướng
+        roomButton = new JButton("Quản lý Phòng");
+        guestButton = new JButton("Quản lý Khách hàng");
+        bookingButton = new JButton("Quản lý Đặt phòng");
+
+        // Thiết lập kích thước mong muốn và căn giữa cho các nút
+        Dimension buttonSize = new Dimension(200, 40);
+        roomButton.setMaximumSize(buttonSize);
+        guestButton.setMaximumSize(buttonSize);
+        bookingButton.setMaximumSize(buttonSize);
+
+        roomButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        guestButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        bookingButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+
+        // Thêm các nút vào panel điều hướng, kèm khoảng cách giữa các nút
+        navPanel.add(Box.createVerticalGlue());
+        navPanel.add(roomButton);
+        navPanel.add(Box.createRigidArea(new Dimension(5, 10)));
+        navPanel.add(guestButton);
+        navPanel.add(Box.createRigidArea(new Dimension(5, 10)));
+        navPanel.add(bookingButton);
+        navPanel.add(Box.createVerticalGlue());
+
+        add(navPanel, BorderLayout.WEST);
+
+        footerPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        logoutButton = new JButton("Đăng xuất");
+        footerPanel.add(logoutButton);
+        add(footerPanel, BorderLayout.SOUTH);
+
+        // --- Thêm lắng nghe sự kiện cho các nút ---
+        roomButton.addActionListener(this);
+        guestButton.addActionListener(this);
+        bookingButton.addActionListener(this);
+        logoutButton.addActionListener(this);
+
+        setVisible(true);
+    }
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() == roomButton) {
+        	cardLayout.show(mainpanel, "room");
+        } else if (e.getSource() == guestButton) {
+        	cardLayout.show(mainpanel, "guest");
+        } else if (e.getSource() == bookingButton) {
+        	cardLayout.show(mainpanel,"booking");
+        }
+        else if (e.getSource() == logoutButton) {
+            // Xử lý khi nút "Đăng xuất" được nhấn
+            System.out.println("Đăng xuất!");
+            // TODO: Thực hiện logic đăng xuất
+            // Ví dụ: Đóng cửa sổ hiện tại và mở lại màn hình đăng nhập
+             dispose(); // Đóng cửa sổ Admin Dashboard
+             new Login().setVisible(true);
+        }
+		
+	}
+	public static void main(String[] args) {
+    	new AdminDashboard();
+          
+    }
+
+}

@@ -1,0 +1,116 @@
+package DAO;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import DATA.DBConnection;
+import DATA.DatPhong;
+
+public class DatPhongDAO {
+	public boolean themDatPhong(DatPhong dp) throws ClassNotFoundException {
+	    String sql = "INSERT INTO datphong (id_khachhang, so_phong, ngay_den, ngay_di) VALUES (?, ?, ?, ?)"; // Sửa tên cột cho đúng CSDL
+	    try (Connection connection = DBConnection.getConnection();
+	         PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) { // Thêm RETURN_GENERATED_KEYS
+	        ps.setInt(1, dp.getKhachHangId());
+	        ps.setInt(2, dp.getPhongId());
+	        ps.setDate(3, dp.getNgayDen());  // Sửa thành ngayDen
+	        ps.setDate(4, dp.getNgayDi());   // Sửa thành ngayDi
+
+	        int affectedRows = ps.executeUpdate();
+	        if (affectedRows > 0) {
+	            try (ResultSet rs = ps.getGeneratedKeys()) {
+	                if (rs.next()) {
+	                    dp.setId(rs.getInt(1)); // Cập nhật id tự sinh
+	                }
+	            }
+	            return true;
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return false;
+	}
+
+	    public boolean xoaDatPhong(int id) throws ClassNotFoundException {
+	        String sql = "DELETE FROM datphong WHERE id=?";
+	        try (Connection connection = DBConnection.getConnection();
+	             PreparedStatement ps = connection.prepareStatement(sql)) {
+	            ps.setInt(1, id);
+	            return ps.executeUpdate() > 0;
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	        return false;
+	    }
+
+	    public List<DatPhong> layTatCaDatPhong() throws ClassNotFoundException {
+	        List<DatPhong> ds = new ArrayList<>();
+	        String sql = "SELECT * FROM datphong";
+	        try (Connection connection = DBConnection.getConnection();
+	             Statement st = connection.createStatement();
+	             ResultSet rs = st.executeQuery(sql)) {
+	            while (rs.next()) {
+	                ds.add(new DatPhong(
+	                        rs.getInt("id"),
+	                        rs.getInt("khachhang_id"),
+	                        rs.getInt("phong_id"),
+	                        rs.getDate("ngay_nhan"),
+	                        rs.getDate("ngay_tra")
+	                ));
+	            }
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	        return ds;
+	    }
+	    
+	    public DatPhong findById(int id) {
+	        String sql = "SELECT * FROM datphong WHERE id = ?";
+	        try (Connection conn = DBConnection.getConnection();
+	             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+	            ps.setInt(1, id);
+	            try (ResultSet rs = ps.executeQuery()) {
+	                if (rs.next()) {
+	                    return mapResultSetToDatPhong(rs);
+	                }
+	            }
+	        } catch (ClassNotFoundException | SQLException e) {
+	            e.printStackTrace();
+	        }
+	        return null;
+	    }
+	    public List<DatPhong> findByKhachHangId(int khId) {
+	        List<DatPhong> list = new ArrayList<>();
+	        String sql = "SELECT * FROM datphong WHERE id_khachhang = ?";
+	        try (Connection conn = DBConnection.getConnection();
+	             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+	            ps.setInt(1, khId);
+	            try (ResultSet rs = ps.executeQuery()) {
+	                while (rs.next()) {
+	                    list.add(mapResultSetToDatPhong(rs));
+	                }
+	            }
+	        } catch (ClassNotFoundException | SQLException e) {
+	            e.printStackTrace();
+	        }
+	        return list;
+	    }
+
+
+		private DatPhong mapResultSetToDatPhong(ResultSet rs) throws SQLException {
+			return new DatPhong(
+		            rs.getInt("id"),
+		            rs.getInt("so_phong"),
+		            rs.getInt("id_khachhang"),
+		            rs.getDate("ngay_den"),
+		            rs.getDate("ngay_di")
+		        );
+		}
+}

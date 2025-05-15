@@ -1,0 +1,29 @@
+package DATA;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+public class DBConnection {
+	public static Connection getConnection() throws ClassNotFoundException {
+		Connection connection = null;
+		try {
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			//DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());
+			String url = "jdbc:mySQL://127.0.0.1:3306/qlks_db";
+			 connection = DriverManager.getConnection(url,"root","Hao@1482005");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return connection;
+	}
+	public static void closeConnection(Connection connection) {
+		try {
+			if(connection!= null) {
+				connection.close();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}

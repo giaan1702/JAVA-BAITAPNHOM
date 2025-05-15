@@ -1,0 +1,162 @@
+package UI;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.*;
+import javax.swing.*;
+import javax.swing.JFrame;
+
+import DATA.KhachHang;
+import Service.KhachHangService;
+
+public class AddCustomer extends JFrame implements ActionListener {
+	
+	private JTextField tfHoTen, tfQuocTich, tfLoaiGiayTo, tfSoGiayTo, tfSdt, tfEmail;
+    private JButton btnSave, btnCancel;
+    private KhachHangService khService = new KhachHangService();
+
+    
+	public AddCustomer() {
+		initUI();
+        setTitle("Thêm khách hàng mới");
+        setSize(400, 350);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setVisible(true);
+	}
+	private void initUI() {
+		JPanel mainPanel = new JPanel(new GridLayout(7, 2, 10, 10));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+
+        // Tạo các trường nhập liệu
+        tfHoTen = createTextField();
+        tfQuocTich = createTextField();
+        tfLoaiGiayTo = createTextField();
+        tfSoGiayTo = createTextField();
+        tfSdt = createTextField();
+        tfEmail = createTextField();
+
+        // Thêm các thành phần vào panel
+        mainPanel.add(new JLabel("Họ tên*:"));
+        mainPanel.add(tfHoTen);
+        mainPanel.add(new JLabel("Quốc tịch:"));
+        mainPanel.add(tfQuocTich);
+        mainPanel.add(new JLabel("Loại giấy tờ*:"));
+        mainPanel.add(tfLoaiGiayTo);
+        mainPanel.add(new JLabel("Số giấy tờ*:"));
+        mainPanel.add(tfSoGiayTo);
+        mainPanel.add(new JLabel("SĐT:"));
+        mainPanel.add(tfSdt);
+        mainPanel.add(new JLabel("Email:"));
+        mainPanel.add(tfEmail);
+
+        // Panel nút bấm
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        btnSave = new JButton("Lưu");
+        btnCancel = new JButton("Hủy");
+
+        // Gán ActionListener
+        btnSave.addActionListener(this);
+        btnCancel.addActionListener(this);
+
+        // Style buttons
+        btnSave.setBackground(new Color(76, 175, 80));
+        btnSave.setForeground(Color.WHITE);
+        btnCancel.setBackground(new Color(244, 67, 54));
+        btnCancel.setForeground(Color.WHITE);
+
+        buttonPanel.add(btnSave);
+        buttonPanel.add(btnCancel);
+
+        add(mainPanel, BorderLayout.CENTER);
+        add(buttonPanel, BorderLayout.SOUTH);
+    }
+
+    private JTextField createTextField() {
+        JTextField tf = new JTextField();
+        tf.setPreferredSize(new Dimension(200, 30));
+        return tf;
+	}
+	@Override
+	public void actionPerformed(ActionEvent e) {
+	        if (e.getSource() == btnSave) {
+	            saveCustomer();
+	        } else if (e.getSource() == btnCancel) {
+	            dispose();
+	            new ViewCustomer().setVisible(true);
+	        }
+	    }
+
+	    private void saveCustomer() {
+	        try {
+	            // Lấy dữ liệu từ form
+	            String hoTen = tfHoTen.getText().trim();
+	            String quocTich = tfQuocTich.getText().trim();
+	            String loaiGiayTo = tfLoaiGiayTo.getText().trim();
+	            String soGiayTo = tfSoGiayTo.getText().trim();
+	            String sdt = tfSdt.getText().trim();
+	            String email = tfEmail.getText().trim();
+	            
+	         // Kiểm tra loại giấy tờ
+	            if (!loaiGiayTo.equalsIgnoreCase("CCCD") && !loaiGiayTo.equalsIgnoreCase("HoChieu")) {
+	                JOptionPane.showMessageDialog(this,
+	                    "Loại giấy tờ chỉ được phép là CCCD hoặc HoChieu",
+	                    "Lỗi loại giấy tờ",
+	                    JOptionPane.ERROR_MESSAGE);
+	                return;
+	            }
+
+
+	            // Kiểm tra dữ liệu bắt buộc
+	            if (hoTen.isEmpty() || loaiGiayTo.isEmpty() || soGiayTo.isEmpty()) {
+	                JOptionPane.showMessageDialog(this, 
+	                    "Vui lòng nhập các trường bắt buộc (*)", 
+	                    "Cảnh báo", 
+	                    JOptionPane.WARNING_MESSAGE);
+	                return;
+	            }
+
+	            // Tạo đối tượng khách hàng
+	            KhachHang kh = new KhachHang(
+	                0, // ID tự động
+	                hoTen,
+	                quocTich,
+	                loaiGiayTo,
+	                soGiayTo,
+	                sdt,
+	                email
+	            );
+
+	            // Gọi service thêm khách hàng
+	            if (khService.themKhachHang(kh)) {
+	                JOptionPane.showMessageDialog(this, 
+	                    "Thêm khách hàng thành công!");
+	                clearForm();
+	            } else {
+	                JOptionPane.showMessageDialog(this, 
+	                    "Thêm thất bại! Số giấy tờ đã tồn tại", 
+	                    "Lỗi", 
+	                    JOptionPane.ERROR_MESSAGE);
+	            }
+	        } catch (Exception ex) {
+	            JOptionPane.showMessageDialog(this, 
+	                "Lỗi hệ thống: " + ex.getMessage(), 
+	                "Lỗi", 
+	                JOptionPane.ERROR_MESSAGE);
+	        }
+	    }
+
+	    private void clearForm() {
+	        tfHoTen.setText("");
+	        tfQuocTich.setText("");
+	        tfLoaiGiayTo.setText("");
+	        tfSoGiayTo.setText("");
+	        tfSdt.setText("");
+	        tfEmail.setText("");
+		
+	}
+	public static void  main(String args[]) {
+    	new AddCustomer();
+    }
+
+}

@@ -1,0 +1,146 @@
+package UI;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JFrame;
+
+import DATA.LoaiPhong;
+import DATA.Phong;
+import Service.LoaiPhongService;
+import Service.PhongService;
+
+import java.awt.*;
+import javax.swing.*;
+import java.util.List;
+public class AddSoPhong extends JFrame implements ActionListener {
+	
+	private JComboBox<String> cbLoaiPhong;
+    private JTextField txtSoPhong;
+    private JButton btnOK, btnQuayLai;
+    private PhongService phongService;
+    private LoaiPhongService loaiPhongService;
+	public AddSoPhong() {
+		phongService = new PhongService();
+        loaiPhongService = new LoaiPhongService();
+        initUI();
+	}
+	
+	private void initUI() {
+        setTitle("Thêm Số Phòng Mới");
+        setSize(400, 200);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        
+        JPanel mainPanel = new JPanel(new GridLayout(3, 2, 15, 15));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        // Thêm components
+        mainPanel.add(new JLabel("Loại phòng:"));
+        cbLoaiPhong = new JComboBox<>();
+        cbLoaiPhong.setSize(30,20);
+        loadLoaiPhong();
+        mainPanel.add(cbLoaiPhong);
+
+        mainPanel.add(new JLabel("Số phòng:"));
+        txtSoPhong = new JTextField(20);
+        mainPanel.add(txtSoPhong);
+
+        // Panel nút
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 15));
+        btnOK = new JButton("OK");
+        btnQuayLai = new JButton("Quay lại");
+        
+        // Style nút
+        btnOK.setBackground(new Color(0, 153, 76));
+        btnOK.setForeground(Color.WHITE);
+        btnQuayLai.setBackground(new Color(204, 0, 0));
+        btnQuayLai.setForeground(Color.WHITE);
+        
+        btnOK.addActionListener(this);
+        btnQuayLai.addActionListener(this);
+        
+        buttonPanel.add(btnOK);
+        buttonPanel.add(btnQuayLai);
+
+        add(mainPanel, BorderLayout.CENTER);
+        add(buttonPanel, BorderLayout.SOUTH);
+	}
+	
+	private void loadLoaiPhong() {
+        try {
+            List<LoaiPhong> dsLoaiPhong = loaiPhongService.layTatCaLoaiPhong();
+            for (LoaiPhong lp : dsLoaiPhong) {
+                cbLoaiPhong.addItem(lp.getTenLoai() + " - " + lp.getGia() + " VND");
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi tải danh sách loại phòng: " + e.getMessage(), 
+                "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() == btnOK) {
+            handleThemPhong();
+        } else if (e.getSource() == btnQuayLai) {
+            dispose();
+        }
+	}
+	
+	private void handleThemPhong() {
+        try {
+            // Lấy số phòng
+            String soPhongText = txtSoPhong.getText().trim();
+            if (soPhongText.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Vui lòng nhập số phòng!", 
+                    "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            int soPhong;
+            try {
+                soPhong = Integer.parseInt(soPhongText);
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Số phòng phải là số nguyên!", 
+                    "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            // Kiểm tra phòng đã tồn tại chưa
+            if (phongService.findBySoPhong(soPhong) != null) {
+                JOptionPane.showMessageDialog(this, "Số phòng đã tồn tại!", 
+                    "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            // Lấy loại phòng được chọn
+            int selectedIndex = cbLoaiPhong.getSelectedIndex();
+            if (selectedIndex < 0) {
+                JOptionPane.showMessageDialog(this, "Vui lòng chọn loại phòng!", 
+                    "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            List<LoaiPhong> dsLoaiPhong = loaiPhongService.layTatCaLoaiPhong();
+            int loaiPhongId = dsLoaiPhong.get(selectedIndex).getId();
+            
+            // Tạo đối tượng Phong và thêm vào CSDL
+            Phong phong = new Phong(soPhong, loaiPhongId);
+            if (phongService.themPhong(phong)) {
+                JOptionPane.showMessageDialog(this, "Thêm phòng thành công!", 
+                    "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                txtSoPhong.setText("");
+            } else {
+                JOptionPane.showMessageDialog(this, "Thêm phòng thất bại!", 
+                    "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
+            
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Lỗi hệ thống: " + e.getMessage(), 
+                "Lỗi", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+	}
+}
+
+

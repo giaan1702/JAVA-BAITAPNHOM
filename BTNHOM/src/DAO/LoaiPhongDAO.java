@@ -1,0 +1,105 @@
+package DAO;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import DATA.DBConnection;
+import DATA.LoaiPhong;
+
+public class LoaiPhongDAO {
+	public boolean themLoaiPhong(LoaiPhong lp) throws ClassNotFoundException {
+        String sql = "INSERT INTO loaiphong (ten_loai_phong, gia) VALUES (?, ?)";
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, lp.getTenLoai());
+            ps.setDouble(2, lp.getGia());
+            int affectedRows = ps.executeUpdate();
+            if (affectedRows == 0) {
+                return false;
+            }
+            
+            // Lấy ID tự động sinh
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    int generatedId = rs.getInt(1); // Lấy ID từ cột đầu tiên
+                    lp.setId(generatedId); // Cập nhật ID vào đối tượng
+                }
+            }
+                return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean suaLoaiPhong(LoaiPhong lp) throws ClassNotFoundException {
+        String sql = "UPDATE loaiphong SET ten_loai_phong=?, gia=? WHERE id=?";
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, lp.getTenLoai());
+            ps.setDouble(2, lp.getGia());
+            ps.setInt(3, lp.getId());
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean xoaLoaiPhong(int id) throws ClassNotFoundException {
+        String sql = "DELETE FROM loaiphong WHERE id=?";
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public List<LoaiPhong> layTatCaLoaiPhong() throws ClassNotFoundException {
+        List<LoaiPhong> list = new ArrayList<>();
+        String sql = "SELECT * FROM loaiphong";
+        try (Connection connection = DBConnection.getConnection();
+             Statement st = connection.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) {
+                list.add(new LoaiPhong(
+                        rs.getInt("id"),
+                        rs.getString("ten_loai_phong"),
+                        rs.getDouble("gia")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+    public LoaiPhong findById(int id) {
+        String sql = "SELECT * FROM loaiphong WHERE id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    // Map ResultSet thành đối tượng LoaiPhong
+                    return new LoaiPhong(
+                        rs.getInt("id"),
+                        rs.getString("ten_loai_phong"),
+                        rs.getDouble("gia")
+                    );
+                }
+            }
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+}

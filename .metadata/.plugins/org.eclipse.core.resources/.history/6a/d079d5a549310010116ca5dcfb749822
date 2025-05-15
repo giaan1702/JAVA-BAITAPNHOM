@@ -1,0 +1,40 @@
+package Service;
+
+import java.time.LocalDate;
+import java.util.List;
+
+import DAO.PhongDAO;
+import DATA.Phong;
+
+public class PhongService {
+	private PhongDAO phongDao = new PhongDAO();
+
+    public boolean themPhong(Phong p) throws ClassNotFoundException {
+        if (p == null || p.getSoPhong() <= 0) return false;
+        return phongDao.themPhong(p);
+    }
+
+    public boolean suaPhong(Phong p) throws ClassNotFoundException {
+        if (p == null || p.getSoPhong() <= 0) return false;
+        return phongDao.suaPhong(p);
+    }
+
+    public boolean xoaPhong(int id) throws ClassNotFoundException {
+        if (id <= 0) return false;
+        return phongDao.xoaPhong(id);
+    }
+
+    public List<Phong> layTatCaPhong() throws ClassNotFoundException {
+        return phongDao.layTatCaPhong();
+    }
+
+    public Phong timTheoId(int id) {
+        return phongDao.findById(id);
+    }
+
+    /** Nghiệp vụ: tìm phòng trống theo khoảng ngày và loại */
+//    public List<Integer> timPhongTrong(LocalDate from, LocalDate to, int loaiPhongId) {
+//        if (to.isBefore(from)) throw new IllegalArgumentException("Ngày đi phải >= ngày đến");
+//        return phongDao.timPhongTrong(from, to, loaiPhongId);
+//    }
+}

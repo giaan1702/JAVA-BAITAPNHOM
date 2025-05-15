@@ -1,0 +1,78 @@
+package DaTa;
+
+public class KhachHang {
+	    private int id;
+	    private String hoTen;
+	    private String quocTich;
+	    private String loaiGiayTo;
+	    private String soGiayTo;
+	    private String sdt;
+	    private String email;
+
+	    public KhachHang(int id, String hoTen, String quocTich, String loaiGiayTo, String soGiayTo, String sdt, String email) {
+	        this.id = id;
+	        this.hoTen = hoTen;
+	        this.quocTich = quocTich;
+	        this.loaiGiayTo = loaiGiayTo;
+	        this.soGiayTo = soGiayTo;
+	        this.sdt = sdt;
+	        this.email = email;
+	    }
+	 // === GETTERS ===
+	    public int getId() {
+	        return id;
+	    }
+
+	    public String getHoTen() {
+	        return hoTen;
+	    }
+
+	    public String getQuocTich() {
+	        return quocTich;
+	    }
+
+	    public String getLoaiGiayTo() {
+	        return loaiGiayTo;
+	    }
+
+	    public String getSoGiayTo() {
+	        return soGiayTo;
+	    }
+
+	    public String getSdt() {
+	        return sdt;
+	    }
+
+	    public String getEmail() {
+	        return email;
+	    }
+
+	    // === SETTERS ===
+	    public void setId(int id) {
+	        this.id = id;
+	    }
+
+	    public void setHoTen(String hoTen) {
+	        this.hoTen = hoTen;
+	    }
+
+	    public void setQuocTich(String quocTich) {
+	        this.quocTich = quocTich;
+	    }
+
+	    public void setLoaiGiayTo(String loaiGiayTo) {
+	        this.loaiGiayTo = loaiGiayTo;
+	    }
+
+	    public void setSoGiayTo(String soGiayTo) {
+	        this.soGiayTo = soGiayTo;
+	    }
+
+	    public void setSdt(String sdt) {
+	        this.sdt = sdt;
+	    }
+
+	    public void setEmail(String email) {
+	        this.email = email;
+	    }
+}

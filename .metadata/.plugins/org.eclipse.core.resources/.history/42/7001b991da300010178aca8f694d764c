@@ -1,0 +1,57 @@
+package Service;
+import java.sql.*;
+import java.time.LocalDate;
+import java.util.*;
+
+import DAO.DatPhongDAO;
+import DAO.NhanvienDAO;
+import DAO.PhongDAO;
+import DATA.DatPhong;
+public class DatPhongService {
+	private DatPhongDAO dpDao = new DatPhongDAO();
+    private PhongDAO phongDao = new PhongDAO();
+    private NhanvienDAO khDao = new NhanvienDAO();
+
+    /** Tạo đặt phòng mới, đồng thời cập nhật trạng thái trong DAO phòng 
+     * @throws ClassNotFoundException */
+    public boolean datPhong(int khachHangId, int soPhong,
+                            LocalDate den, LocalDate di) throws ClassNotFoundException {
+        // 1. Kiểm khách hàng tồn tại
+        if (khDao.findById(khachHangId) == null) {
+            System.out.println("Khách hàng không tồn tại");
+            return false;
+        }
+        // 2. Kiểm phòng tồn tại
+        if (phongDao.findBySoPhong(soPhong) == null) {
+            System.out.println("Phòng không tồn tại");
+            return false;
+        }
+        // 3. Kiểm phòng trống
+        List<Integer> avail = phongDao.timPhongTrong(den, di,
+                phongDao.findBySoPhong(soPhong).getLoaiPhongId());
+        if (!avail.contains(soPhong)) {
+            System.out.println("Phòng đã được đặt");
+            return false;
+        }
+        // 4. Tạo bản ghi datphong
+        DatPhong dp = new DatPhong(0, khachHangId, soPhong,
+                java.sql.Date.valueOf(den), java.sql.Date.valueOf(di));
+        return dpDao.themDatPhong(dp);
+    }
+
+    public boolean huyDatPhong(int id) throws ClassNotFoundException {
+        return dpDao.xoaDatPhong(id);
+    }
+
+    public List<DatPhong> layTatCaDatPhong() throws ClassNotFoundException {
+        return dpDao.layTatCaDatPhong();
+    }
+
+    public DatPhong timDatPhongTheoId(int id) {
+        return dpDao.findById(id);
+    }
+
+    public List<DatPhong> layDatPhongTheoKhachHang(int khId) {
+        return dpDao.findByKhachHangId(khId);
+    }
+}

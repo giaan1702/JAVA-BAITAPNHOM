@@ -1,0 +1,39 @@
+package DATA;
+
+import java.sql.Date;
+
+public class DatPhong {
+	private int id;
+	    private int khachHangId;
+	    private int phongId;
+	    private Date ngayDen;
+	    private Date ngayDi;
+
+	    public DatPhong(int khachHangId, int phongId, Date ngayDen, Date ngayDi) {
+	    	
+	        this.khachHangId = khachHangId;
+	        this.phongId = phongId;
+	        this.ngayDen = ngayDen;
+	        this.ngayDi = ngayDi;
+	    }
+	    public DatPhong(int id, int khachHangId, int phongId, Date ngayDen, Date ngayDi) {
+	        this.id = id;
+	        this.khachHangId = khachHangId;
+	        this.phongId = phongId;
+	        this.ngayDen = ngayDen;
+	        this.ngayDi = ngayDi;
+	    }
+
+	    // Getters & Setters
+	    
+	    public int getKhachHangId() { return khachHangId; }
+	    public int getPhongId() { return phongId; }
+	    public Date getNgayNhan() { return ngayDen; }
+	    public Date getNgayTra() { return ngayDi; }
+
+	 
+	    public void setKhachHangId(int khachHangId) { this.khachHangId = khachHangId; }
+	    public void setPhongId(int phongId) { this.phongId = phongId; }
+	    public void setNgayNhan(Date ngayDen) { this.ngayDen = ngayDen; }
+	    public void setNgayTra(Date ngayDi) { this.ngayDi = ngayDi; }
+}

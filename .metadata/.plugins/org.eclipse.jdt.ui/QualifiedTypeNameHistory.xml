@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+    <fullyQualifiedTypeName name="java.util.List"/>
+    <fullyQualifiedTypeName name="UI.AddCustomer"/>
+    <fullyQualifiedTypeName name="UI.StaffDashboard"/>
+    <fullyQualifiedTypeName name="UI.ViewCustomer"/>
+    <fullyQualifiedTypeName name="UI.Booking1"/>
+    <fullyQualifiedTypeName name="javax.swing.JFrame"/>
+    <fullyQualifiedTypeName name="javax.swing.JLabel"/>
+    <fullyQualifiedTypeName name="javax.swing.JTextField"/>
+    <fullyQualifiedTypeName name="UI.Booking2"/>
+    <fullyQualifiedTypeName name="UI.Payment"/>
+    <fullyQualifiedTypeName name="javax.swing.JPanel"/>
+    <fullyQualifiedTypeName name="javax.swing.JButton"/>
+    <fullyQualifiedTypeName name="UI.AddUser"/>
+    <fullyQualifiedTypeName name="UI.AddLoaiPhong"/>
+    <fullyQualifiedTypeName name="java.awt.event.ActionListener"/>
+    <fullyQualifiedTypeName name="UI.AddSoPhong"/>
+</qualifiedTypeNameHistroy>

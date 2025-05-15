@@ -1,0 +1,115 @@
+package UI;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JFrame;
+
+import DATA.KhachHang;
+
+import java.awt.*;
+import javax.swing.*;
+public class EditCustomer extends JFrame implements ActionListener {
+	public EditCustomer() {
+		initUI();
+        setTitle("Sửa Thông Tin Khách Hàng");
+        setSize(400, 350);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setVisible(true);
+	}
+	
+	 private JTextField tfId, tfHoTen, tfQuocTich, tfLoaiGT, tfSoGT, tfSDT, tfEmail;
+	    private JButton btnSave;
+	    private KhachHang kh;
+	    private ViewCustomer parent;
+	    
+	    
+	    private void initUI() {
+
+	        JPanel panel = new JPanel(new GridLayout(8, 2, 5, 5));
+	        
+	        // Thêm các components
+	        panel.add(new JLabel("ID:"));
+	        tfId = new JTextField();
+	        tfId.setEditable(false);
+	        panel.add(tfId);
+
+	        panel.add(new JLabel("Họ tên:"));
+	        tfHoTen = new JTextField();
+	        panel.add(tfHoTen);
+
+	        panel.add(new JLabel("Quốc tịch:"));
+	        tfQuocTich = new JTextField();
+	        panel.add(tfQuocTich);
+
+	        panel.add(new JLabel("Loại giấy tờ:"));
+	        tfLoaiGT = new JTextField();
+	        panel.add(tfLoaiGT);
+
+	        panel.add(new JLabel("Số giấy tờ:"));
+	        tfSoGT = new JTextField();
+	        panel.add(tfSoGT);
+
+	        panel.add(new JLabel("SĐT:"));
+	        tfSDT = new JTextField();
+	        panel.add(tfSDT);
+
+	        panel.add(new JLabel("Email:"));
+	        tfEmail = new JTextField();
+	        panel.add(tfEmail);
+
+	        btnSave = new JButton("Lưu");
+	        btnSave.addActionListener(this);
+	        panel.add(btnSave);
+
+	        if (kh != null) {
+	            fillData();
+	        } else {
+	            tfId.setText("Auto");
+	        }
+
+	        add(panel);
+	    }
+	    
+	    private void fillData() {
+	        tfId.setText(String.valueOf(kh.getId()));
+	        tfHoTen.setText(kh.getHoTen());
+	        tfQuocTich.setText(kh.getQuocTich());
+	        tfLoaiGT.setText(kh.getLoaiGiayTo());
+	        tfSoGT.setText(kh.getSoGiayTo());
+	        tfSDT.setText(kh.getSdt());
+	        tfEmail.setText(kh.getEmail());
+	    }
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		try {
+            KhachHang newKH = new KhachHang(
+                kh != null ? kh.getId() : 0,
+                tfHoTen.getText(),
+                tfQuocTich.getText(),
+                tfLoaiGT.getText(),
+                tfSoGT.getText(),
+                tfSDT.getText(),
+                tfEmail.getText()
+            );
+
+            boolean result;
+            if (kh == null) {
+                result = khService.themKhachHang(newKH);
+            } else {
+                result = khService.suaKhachHang(newKH);
+            }
+
+            if (result) {
+                JOptionPane.showMessageDialog(this, "Lưu thành công!");
+                dispose();
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Lỗi: " + ex.getMessage());
+        }
+    }
+		
+	}
+
+}

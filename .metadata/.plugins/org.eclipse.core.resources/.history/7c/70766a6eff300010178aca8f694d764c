@@ -1,0 +1,145 @@
+package DAO;
+
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+import DATA.DBConnection;
+import DATA.Phong;
+
+public class PhongDAO {
+	public boolean themPhong(Phong p) throws ClassNotFoundException {
+        String sql = "INSERT INTO phong (id, so_phong, loai_phong_id) VALUES (?, ?, ?)";
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, p.getId());
+            ps.setInt(2, p.getSoPhong());
+            ps.setInt(3, p.getLoaiPhongId());
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean suaPhong(Phong p) throws ClassNotFoundException {
+        String sql = "UPDATE phong SET so_phong=?, loai_phong_id=? WHERE id=?";
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, p.getSoPhong());
+            ps.setInt(2, p.getLoaiPhongId());
+            ps.setInt(3, p.getId());
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean xoaPhong(int id) throws ClassNotFoundException {
+        String sql = "DELETE FROM phong WHERE id=?";
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public List<Phong> layTatCaPhong() throws ClassNotFoundException {
+        List<Phong> ds = new ArrayList<>();
+        String sql = "SELECT * FROM phong";
+        try (Connection connection = DBConnection.getConnection();
+             Statement st = connection.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) {
+                ds.add(new Phong(
+                        rs.getInt("id"),
+                        rs.getInt("so_phong"),
+                        rs.getInt("loai_phong_id")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return ds;
+    }
+    public Phong findById(int id) {
+        String sql = "SELECT * FROM phong WHERE id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new Phong(
+                        rs.getInt("id"),
+                        rs.getInt("so_phong"),
+                        rs.getInt("id_loaiphong")
+                    );
+                }
+            }
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    public List<Integer> timPhongTrong(LocalDate from, LocalDate to, int loaiPhongId) {
+        List<Integer> result = new ArrayList<>();
+        String sql = """
+            SELECT p.so_phong
+            FROM phong p
+            WHERE p.id_loaiphong = ?
+              AND p.so_phong NOT IN (
+                  SELECT dp.so_phong
+                  FROM datphong dp
+                  WHERE NOT (dp.ngay_di < ? OR dp.ngay_den > ?)
+              )
+            """;
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, loaiPhongId);
+            ps.setDate(2, Date.valueOf(from));
+            ps.setDate(3, Date.valueOf(to));
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    result.add(rs.getInt("so_phong"));
+                }
+            }
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+    
+    public Phong findBySoPhong(int soPhong) {
+        String sql = "SELECT * FROM phong WHERE so_phong = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, soPhong);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new Phong(
+                        rs.getInt("id"),
+                        rs.getInt("so_phong"),
+                        rs.getInt("id_loaiphong")
+                    );
+                }
+            }
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+}

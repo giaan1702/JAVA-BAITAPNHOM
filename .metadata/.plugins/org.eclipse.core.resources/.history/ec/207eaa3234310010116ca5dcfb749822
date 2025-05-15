@@ -1,0 +1,161 @@
+package UI;
+
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.time.LocalDate;
+import java.util.List;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
+
+import DAO.KhachHangDAO;
+import DAO.PhongDAO;
+import DATA.LoaiPhong;
+import DATA.Phong;
+import Service.DatPhongService;
+
+public class Booking2 extends JFrame implements ActionListener {
+	private JLabel lbName;
+    private JTable tblPhong;
+    private JTextField txtSoPhong;
+    private JButton btnOK, btnBack;
+    private DefaultTableModel model;
+    private LocalDate checkin, checkout;
+    private String customerName;
+    private DatPhongService datPhongService = new DatPhongService();
+    private PhongDAO phongDAO = new PhongDAO();
+    private KhachHangDAO khachHangDAO = new KhachHangDAO();
+	public Booking2(String customerName, LocalDate checkin, LocalDate checkout) {
+		this.customerName = customerName;
+        this.checkin = checkin;
+        this.checkout = checkout;
+
+		initUI();
+		loadPhongTrong();
+        setTitle("Chọn Phòng");
+        setSize(800, 400);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setVisible(true);
+	}
+	private void initUI() {
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        // Customer Info
+        JPanel infoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        lbName = new JLabel("Khách hàng: " + customerName);
+        infoPanel.add(lbName);
+        panel.add(infoPanel, BorderLayout.NORTH);
+
+        // Room Table
+        String[] columns = {"Loại Phòng", "Giá", "Số Phòng"};
+        model = new DefaultTableModel(columns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        tblPhong = new JTable(model);
+        panel.add(new JScrollPane(tblPhong), BorderLayout.CENTER);
+
+        // Input Panel
+        JPanel inputPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        inputPanel.add(new JLabel("Số phòng muốn chọn:"));
+        txtSoPhong = new JTextField(10);
+        inputPanel.add(txtSoPhong);
+
+        btnOK = new JButton("OK");
+        btnOK.addActionListener(this);
+        inputPanel.add(btnOK);
+
+        btnBack = new JButton("Quay lại");
+        btnBack.addActionListener(this);
+        inputPanel.add(btnBack);
+
+        panel.add(inputPanel, BorderLayout.SOUTH);
+        add(panel);
+    }
+	
+	private void loadPhongTrong() {
+	    model.setRowCount(0);
+	    try {
+	        // Thứ tự tham số: from (checkin), to (checkout)
+	        List<Phong> phongTrong = phongDAO.timPhongTrong(
+	            checkin,   // Ngày bắt đầu (check-in)
+	            checkout,  // Ngày kết thúc (check-out)
+	            -1         // Không lọc theo loại phòng
+	        );
+
+	        if (phongTrong.isEmpty()) {
+	            JOptionPane.showMessageDialog(this, 
+	                "Không có phòng trống từ " + checkin + " đến " + checkout, 
+	                "Thông báo", 
+	                JOptionPane.INFORMATION_MESSAGE
+	            );
+	            return;
+	        }
+
+	        // Hiển thị thông tin phòng + loại phòng
+	        for (Phong p : phongTrong) {
+	            LoaiPhong loai = phongDAO.getLoaiPhong(p.getLoaiPhongId());
+	            if (loai != null) {
+	                model.addRow(new Object[]{
+	                    loai.getTenLoai(),
+	                    String.format("%,d VND", (int) loai.getGia()),
+	                    p.getSoPhong()
+	                });
+	            }
+	        }
+	    } catch (Exception e) {
+	        JOptionPane.showMessageDialog(this, 
+	            "Lỗi tải danh sách phòng: " + e.getMessage(), 
+	            "Lỗi", 
+	            JOptionPane.ERROR_MESSAGE
+	        );
+	        e.printStackTrace();
+	    }
+	}
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() == btnOK) {
+            handleOK();
+        } else if (e.getSource() == btnBack) {
+            this.dispose();
+        }
+    }
+
+    private void handleOK() {
+        try {
+            int soPhong = Integer.parseInt(txtSoPhong.getText());
+            int khachHangId = KhachHangDAO.findIdByName(customerName);
+
+            if (datPhongService.datPhong(
+                khachHangId, 
+                soPhong, 
+                checkin, 
+                checkout
+            )) {
+                JOptionPane.showMessageDialog(this, "Đặt phòng thành công!");
+                this.dispose();
+            }
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Số phòng phải là số!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Lỗi: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+		
+	}
+

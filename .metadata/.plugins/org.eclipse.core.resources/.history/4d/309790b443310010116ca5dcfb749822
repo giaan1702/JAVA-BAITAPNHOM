@@ -1,0 +1,117 @@
+package UI;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JFrame;
+
+import DATA.LoaiPhong;
+import Service.LoaiPhongService;
+
+import java.awt.*;
+import javax.swing.*;
+public class AddLoaiPhong extends JFrame implements ActionListener {
+	
+	private JTextField txtTenLoai;
+    private JTextField txtGia;
+    private JButton btnTao, btnQuayLai;
+    private LoaiPhongService lpService;
+    
+	public AddLoaiPhong() {
+		 lpService = new LoaiPhongService();
+	        initUI();
+	}
+	
+	private void initUI() {
+        setTitle("Thêm Loại Phòng Mới");
+        setSize(400, 250);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        
+        JPanel mainPanel = new JPanel(new GridLayout(3, 2, 15, 15));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        // Thêm components
+        mainPanel.add(new JLabel("Tên loại phòng:"));
+        txtTenLoai = new JTextField();
+        mainPanel.add(txtTenLoai);
+
+        mainPanel.add(new JLabel("Giá phòng (VND):"));
+        txtGia = new JTextField();
+        mainPanel.add(txtGia);
+
+        // Panel nút
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 15));
+        btnTao = new JButton("Tạo mới");
+        btnQuayLai = new JButton("Quay lại");
+        
+        // Style nút
+        btnTao.setBackground(new Color(0, 153, 76));
+        btnTao.setForeground(Color.WHITE);
+        btnQuayLai.setBackground(new Color(204, 0, 0));
+        btnQuayLai.setForeground(Color.WHITE);
+        
+        btnTao.addActionListener(this);
+        btnQuayLai.addActionListener(this);
+        
+        buttonPanel.add(btnTao);
+        buttonPanel.add(btnQuayLai);
+
+        add(mainPanel, BorderLayout.CENTER);
+        add(buttonPanel, BorderLayout.SOUTH);
+	}
+	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		 if (e.getSource() == btnTao) {
+	            handleThemLoaiPhong();
+	        } else if (e.getSource() == btnQuayLai) {
+	            dispose();
+	        }
+	}
+	
+	 private void handleThemLoaiPhong() {
+	        String tenLoai = txtTenLoai.getText().trim();
+	        String giaText = txtGia.getText().trim();
+	        
+	        // Validation
+	        if (tenLoai.isEmpty() || giaText.isEmpty()) {
+	            showError("Vui lòng điền đầy đủ thông tin!");
+	            return;
+	        }
+	        
+	        try {
+	            double gia = Double.parseDouble(giaText);
+	            if (gia <= 0) {
+	                showError("Giá phòng phải lớn hơn 0!");
+	                return;
+	            }
+	            
+	            LoaiPhong lp = new LoaiPhong(0, tenLoai, gia);
+	            
+	            if (lpService.themLoaiPhong(lp)) {
+	                JOptionPane.showMessageDialog(this, "Thêm loại phòng thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+	                clearForm();
+	            } else {
+	                showError("Thêm loại phòng thất bại! Kiểm tra lại dữ liệu");
+	            }
+	        } catch (NumberFormatException e) {
+	            showError("Giá phòng phải là số hợp lệ!");
+	        } catch (Exception e) {
+	            showError("Lỗi hệ thống: " + e.getMessage());
+	        }
+	    }
+
+	    private void clearForm() {
+	        txtTenLoai.setText("");
+	        txtGia.setText("");
+	    }
+
+	    private void showError(String message) {
+	        JOptionPane.showMessageDialog(this, message, "Lỗi", JOptionPane.ERROR_MESSAGE);
+	    }
+
+	
+	
+
+}

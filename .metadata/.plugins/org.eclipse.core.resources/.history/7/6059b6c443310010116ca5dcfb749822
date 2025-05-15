@@ -1,0 +1,159 @@
+package UI;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.*;
+import javax.swing.*;
+
+public class AdminDashboard extends JFrame implements ActionListener {
+	private int AdminID;
+    private JPanel navPanel;
+    private JButton bookRoomButton;
+    private JButton viewCustomerButton;
+    private JButton paymentButton;
+    private JButton adduserButton;
+    private JButton addphongButton;
+    private JButton addsophong;
+    private JButton logoutButton;
+    private JPanel footerPanel;
+    private JPanel mainPanel;
+    private CardLayout cardLayout;
+
+    // Panels
+    private JPanel bookRoomPanel;
+    private JPanel viewCustomerJPanel;
+    private JPanel paymentPanel;
+    private JPanel adduserPanel;
+    private JPanel addphongPanel;
+    private JPanel addsophongPanel;
+    
+    public AdminDashboard() {
+    	setTitle("Hệ thống Quản lý Khách sạn - Trang Admin");
+        setSize(800, 600);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        setLayout(new BorderLayout());
+
+        cardLayout = new CardLayout();
+        mainPanel = new JPanel(cardLayout);
+
+        // Khởi tạo các panel
+        bookRoomPanel = new JPanel();
+        viewCustomerJPanel = new JPanel();
+        paymentPanel = new JPanel();
+        adduserPanel = new JPanel();
+        addphongPanel = new JPanel();
+        addsophongPanel = new JPanel();
+
+        // Đăng ký các panel vào mainPanel
+        mainPanel.add(bookRoomPanel, "bookRoom");
+        mainPanel.add(viewCustomerJPanel, "bookingHistory");
+        mainPanel.add(paymentPanel, "payment");
+        mainPanel.add(adduserPanel, "adduser");
+        mainPanel.add(addphongPanel, "addphong");
+        mainPanel.add(addsophongPanel, "addsophong");
+
+        // ========== Tạo thanh điều hướng ==========
+        navPanel = new JPanel();
+        navPanel.setLayout(new BoxLayout(navPanel, BoxLayout.Y_AXIS));
+        navPanel.setBorder(BorderFactory.createEmptyBorder(20, 15, 20, 15));
+        navPanel.setBackground(new Color(245, 245, 245));
+
+        // Nhóm 1 - Quản lý đặt phòng
+        JLabel group1 = new JLabel("QUẢN LÝ ĐẶT PHÒNG");
+        styleSectionLabel(group1);
+        navPanel.add(group1);
+        navPanel.add(Box.createVerticalStrut(10));
+
+        bookRoomButton = createNavButton("🛏 Đặt phòng mới");
+        viewCustomerButton = createNavButton("👥 Quản lý khách hàng");
+        paymentButton = createNavButton("💳 Thanh toán dịch vụ");
+
+        // Nhóm 2 - Quản lý hệ thống
+        navPanel.add(Box.createVerticalStrut(25));
+        JLabel group2 = new JLabel("CẤU HÌNH HỆ THỐNG");
+        styleSectionLabel(group2);
+        navPanel.add(group2);
+        navPanel.add(Box.createVerticalStrut(10));
+
+        adduserButton = createNavButton("👤 Thêm người dùng");
+        addphongButton = createNavButton("🏨 Thêm loại phòng");
+        addsophong = createNavButton("🔢 Thêm số phòng");
+
+        // Nút đăng xuất
+        navPanel.add(Box.createVerticalGlue());
+        logoutButton = new JButton("🚪 Đăng xuất");
+        logoutButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        logoutButton.setForeground(Color.RED);
+        logoutButton.setBorder(BorderFactory.createEmptyBorder(5, 20, 5, 20));
+        logoutButton.addActionListener(this);
+
+        navPanel.add(logoutButton);
+
+        // ========== Thiết lập giao diện chính ==========
+        add(navPanel, BorderLayout.WEST);
+        add(mainPanel, BorderLayout.CENTER);
+
+        // Gắn ActionListener
+        for (JButton btn : new JButton[]{bookRoomButton, viewCustomerButton, paymentButton, 
+                                       adduserButton, addphongButton, addsophong}) {
+            btn.addActionListener(this);
+        }
+
+        // Hiển thị màn hình chào mừng
+        JLabel welcomeLabel = new JLabel("CHÀO MỪNG QUẢN TRỊ VIÊN", JLabel.CENTER);
+        welcomeLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        welcomeLabel.setForeground(new Color(70, 130, 180));
+        mainPanel.add(welcomeLabel, "home");
+        cardLayout.show(mainPanel, "home");
+
+        setVisible(true);
+    }
+    
+    private JButton createNavButton(String text) {
+        JButton btn = new JButton(text);
+        btn.setMaximumSize(new Dimension(220, 45));
+        btn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btn.setFont(new Font("Noto Color Emoji", Font.PLAIN, 14));
+        btn.setBackground(Color.WHITE);
+        btn.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(220, 220, 220)),
+            BorderFactory.createEmptyBorder(8, 20, 8, 20)
+        ));
+        navPanel.add(btn);
+        navPanel.add(Box.createVerticalStrut(8));
+        return btn;
+    }
+
+    private void styleSectionLabel(JLabel label) {
+        label.setFont(new Font("Arial", Font.BOLD, 11));
+        label.setForeground(new Color(100, 100, 100));
+        label.setAlignmentX(Component.CENTER_ALIGNMENT);
+        label.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
+    }
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() == bookRoomButton) {
+	           new Booking1().setVisible(true);
+	        } else if (e.getSource() == viewCustomerButton) {
+	            new ViewCustomer().setVisible(true);
+	        } else if (e.getSource() == paymentButton) {
+	            new Payment().setVisible(true);
+	        } else if (e.getSource() == adduserButton) {
+	            new AddUser().setVisible(true);
+	        } else if (e.getSource() == addphongButton) {
+	            new Payment().setVisible(true);
+	        } else if (e.getSource() == addsophong) {
+	            new Payment().setVisible(true);
+	        } else if (e.getSource() == logoutButton) {
+	            dispose();
+	            new Login().setVisible(true);
+	        }
+		
+	}
+	public static void main(String[] args) {
+    	new AdminDashboard();
+          
+    }
+
+}
